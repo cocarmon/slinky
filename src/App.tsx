@@ -1,6 +1,12 @@
+import Sidebar from "@/components/layout/Sidebar"
+import GeneratedMaze from "./features/generation/GeneratedMaze"
+
 function App() {
   return (
-    <p className='bg-red-500'>Tailwind works</p>
+    <div className="flex h-screen">
+      <Sidebar/>
+      <GeneratedMaze/>
+    </div>
   )
 }
 
