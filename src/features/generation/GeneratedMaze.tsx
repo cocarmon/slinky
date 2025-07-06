@@ -1,19 +1,24 @@
+import { useMazeContext } from '@/context/MazeContext';
 import { generateMaze } from '@/utils/mazeGenerator';
 
-const size = 20;
-
 export default function GeneratedMaze() {
-    const grid = generateMaze(size);
+    const {options} = useMazeContext();
+    const grid = generateMaze(Number(options.size));
     return (
             <div
                 className="grid w-full h-full border-b border-r border-zinc-500"
                 style={{
-                    gridTemplateColumns: `repeat(${size}, 1fr)`,
-                    gridTemplateRows: `repeat(${size}, 1fr)`,
+                    gridTemplateColumns: `repeat(${options.size}, 1fr)`,
+                    gridTemplateRows: `repeat(${options.size}, 1fr)`,
                 }}
                 >
-                {grid.flat().map((_, i) => (
-                    <div key={i} className="border-l border-t border-zinc-500"></div>
+                {grid.flat().map((cell, i) => (
+                    <div key={i} className={`${
+                        cell.walls.top ? 'border-t border-zinc-500' : ''
+                      } ${
+                        cell.walls.left ? 'border-l border-zinc-500' : ''
+                      }`}
+                      ></div>
                 ))}
             </div>
     )
