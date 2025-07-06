@@ -1,11 +1,11 @@
 import Sidebar from "@/components/layout/Sidebar"
-import GeneratedMaze from "./features/generation/GeneratedMaze"
+import Canvas from "./features/canvas/Canvas"
 
 function App() {
   return (
     <div className="flex h-screen">
       <Sidebar/>
-      <GeneratedMaze/>
+      <Canvas/>
     </div>
   )
 }
