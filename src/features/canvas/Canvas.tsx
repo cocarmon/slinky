@@ -1,60 +1,118 @@
-import { useEffect, useRef } from 'react'
-import { generateMaze } from '@/utils/mazeGenerator';
-import { useMazeContext } from '@/context/MazeContext';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { generateMaze } from "@/utils/mazeGenerator";
+import { bfsAlgorithm } from '@/utils/algorithms'; 
 
-export default function Canvas() {
+interface CanvasProps {
+    size: number;
+    start:boolean;
+    resetStart: () => void
+};
+
+interface Rectangle {
+    x: number;
+    y: number;
+    ctx: CanvasRenderingContext2D;
+}
+
+export default function Canvas({size,start,resetStart}:CanvasProps) {
+    const maze = useMemo(()=>generateMaze(Number(size)),[size]);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null); // occupies the avaible screen space so we can calculate the canvas's space for responsiveness
-    const {options} = useMazeContext();
-    const grid = generateMaze(Number(options.size));
+    
+    const drawRect = ({x,y,ctx}:Rectangle)  => {
+        const padding = 3;
+        const cellWidth = canvasRef.current!.width / size;
+        const cellHeight = canvasRef.current!.height / size;
+        const leftPad = maze[y][x].walls.left ? padding : 0;
+        const rightPad = maze[y][x].walls.right ? padding : 0;
+        const topPad = maze[y][x].walls.top ? padding : 0;
+        const bottomPad = maze[y][x].walls.bottom ? padding : 0;
+    
+        ctx.fillRect(
+            x * cellWidth + leftPad,
+            y * cellHeight + topPad,
+            cellWidth - leftPad - rightPad,
+            cellHeight - topPad - bottomPad
+        );
 
-    const draw  = (ctx:CanvasRenderingContext2D ) => {
-        const cellWidth = canvasRef.current.width / options.size;
-        const cellHeight = canvasRef.current.height / options.size;
-        // Starting Cell
-        ctx.fillStyle = '#22c55e';
+    };
+
+    const drawShortestPath = useCallback((ctx:CanvasRenderingContext2D) => {
+        // the maze is always a square
+        let matrixNode = maze[maze.length - 1][maze.length - 1];
+        ctx.fillStyle = '#dc2626';
+
+        do {
+            drawRect({x:matrixNode.x,y:matrixNode.y,ctx});
+            if(!matrixNode.prev) break;
+            const [x,y] = matrixNode.prev;
+            matrixNode = maze[y][x];
+        } while (matrixNode);
+
+    },[maze])
+
+    const drawMaze = useCallback((ctx:CanvasRenderingContext2D ) => {
+        const cellWidth = canvasRef.current!.width / Number(size);
+        const cellHeight = canvasRef.current!.height / Number(size);
+        ctx.clearRect(0,0,canvasRef.current!.width,canvasRef.current!.height);
+
+        // wall color
+        ctx.strokeStyle = '#22c55e';
+
+        // starting cell
+        ctx.fillStyle = '#3b82f6';
         ctx.fillRect(0, 0, cellWidth, cellHeight);
-        // End Cell
-        ctx.fillStyle = '#ef4444';
-        ctx.fillRect((grid[0].length - 1) * cellWidth, (grid.length-1) * cellHeight, cellWidth, cellHeight);
 
-        for (let row = 0; row < grid.length; row++) {
-            for (let col = 0; col < grid[row].length; col++) {
+        // end cell
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect((maze[0].length - 1) * cellWidth, (maze.length-1) * cellHeight, cellWidth, cellHeight);
+
+        ctx.beginPath();
+
+        for (let row = 0; row < maze.length; row++) {
+            for (let col = 0; col < maze[row].length; col++) {
+
                 const xStart = col* cellWidth;
                 const xEnd = (col * cellWidth) + cellWidth;
+
                 const yStart = row * cellHeight;
                 const yEnd = (row * cellHeight) + cellHeight;
 
-                ctx.strokeStyle = '#71717a';
-                ctx.beginPath();
                 ctx.moveTo(xStart,yStart);
-
-                if (grid[row][col].walls.left) {
+                if (maze[row][col].walls.left) {
                     ctx.lineTo(xStart,yEnd);
                 }
-                if (grid[row][col].walls.top) {
+                if (maze[row][col].walls.top) {
                     ctx.moveTo(xStart,yStart);
                     ctx.lineTo(xEnd,yStart);
                 }
                 // we only draw the left and top wall of each cell 
                 
                 // add right boudnary to last column
-                if(col == grid[row].length - 1) {
+                if(col == maze[row].length - 1) {
                     ctx.moveTo(xEnd,yStart);
                     ctx.lineTo(xEnd,yEnd);
                 }
                 // add bottom boundary to last row
-                if(row == grid.length - 1) {
+                if(row == maze.length - 1) {
                     ctx.moveTo(xStart,yEnd);
                     ctx.lineTo(xEnd,yEnd);
                 }
                 
-                ctx.stroke()
             };
         };
+        ctx.stroke();
+    },[maze]);
 
-    };
-
+    const handleOnStart = useCallback(async (ctx:CanvasRenderingContext2D) => {
+        ctx.fillStyle = '#f87171';
+        for (const [x, y] of bfsAlgorithm(maze)) {
+            drawRect({ x, y, ctx });
+            // returns once the rectangle has been drawn on screen
+            await new Promise(requestAnimationFrame);
+        }
+        drawShortestPath(ctx);
+    },[maze])
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -63,15 +121,23 @@ export default function Canvas() {
         const { width, height } = container.getBoundingClientRect();
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        draw(ctx!)
+        const ctx = canvas.getContext('2d')!;
+        drawMaze(ctx);
+    },[maze,drawMaze]);
 
-    },[grid]);
-    
-  return (
-    <div ref={containerRef} className="h-full w-full ">
-        <canvas ref={canvasRef} />
-    </div>
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const container = containerRef.current;
+        if (!canvas || !container || !start) return;
+        const ctx = canvas.getContext('2d')!;
+        handleOnStart(ctx);
+        resetStart();
+    },[start,handleOnStart,drawShortestPath]);
 
-  )
+    return (
+        <div ref={containerRef} className="h-full w-full ">
+            <canvas ref={canvasRef} />
+        </div>
+
+    )
 }

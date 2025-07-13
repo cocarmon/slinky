@@ -1,6 +1,6 @@
-import { useMazeContext, type MazeOptionKey } from '@/context/MazeContext';
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import { type ChangeEvent, type PropsWithChildren } from 'react';
+import { useMazeContext, type MazeOptionKey } from '@/context/MazeContext';
 
 
 interface SelectProps extends PropsWithChildren{

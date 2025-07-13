@@ -1,19 +1,20 @@
+import type { Maze } from "@/types";
 
 interface ChooseWallTypes {
     x: number;
     y: number;
-    grid: number[][]
+    grid: Maze
 }
 
 
 export const generateMaze = (size:number) => {
-    const grid = Array.from({length: size}, (_,y) => Array.from({length: size}, (_,x) =>({x:x, y:y, visited:false, walls: { top: true, right: true, bottom: true, left: true }})));
+    const grid = Array.from({length: size}, (_,y) => Array.from({length: size}, (_,x) =>({x:x, y:y, visited:false,seen:false, prev: null, walls: { top: true, right: true, bottom: true, left: true }})));
     const maze = iterativeDFS(grid);
     return maze;
 };
 
 
-// Chooses only a valid next cell, if no other valid cells exists returns a boolean to backtrack
+// chooses only a valid next cell, if no other valid cells exists returns a boolean to backtrack
 const chooseWall = ({x,y,grid}:ChooseWallTypes) => {
     let keepGoing = true;
     
@@ -50,7 +51,7 @@ const chooseWall = ({x,y,grid}:ChooseWallTypes) => {
 // Grab valid next cell
 // remove walls
 // if no valid options, backtrack
-const iterativeDFS = (grid) => {
+const iterativeDFS = (grid:Maze) => {
     const stack = [[0,0]];
     grid[0][0].visited = true;
     let currentY = 0;
@@ -91,6 +92,5 @@ const iterativeDFS = (grid) => {
             }
         };
     }
-
     return grid;
 };

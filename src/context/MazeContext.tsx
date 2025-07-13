@@ -4,8 +4,9 @@ import { createContext, useContext, useState } from "react";
 export type MazeOptionKey = 'engine' | 'size' | 'algorithm';
 
 export interface MazeOptions {
+  start: boolean,
   engine: 'JS' | 'WASM';
-  size: '20' | '40' | '60' | '100';
+  size: '20' | '40' | '60' | '500';
   algorithm: "A*" | "Dijkstra" | "Breadth-First Search";
 }
 
@@ -15,6 +16,7 @@ interface MazeContextType {
 }
 
 const defaultOptions: MazeOptions = {
+  start: false,
   engine: 'JS',
   size: '20',
   algorithm: 'A*',
