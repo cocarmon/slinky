@@ -2,7 +2,7 @@ import { Select, SelectMenu } from '@/components/ui/SelectMenu';
 
 const MAZE_OPTIONS = {
     SIZE: ['20' , '40' , '60' , '150'],
-    ALGORITHM: ["A*" , "Dijkstra" , "Breadth-First Search"],
+    ALGORITHM: ["Breadth-First Search", "Depth-First Search", "A*" ],
     ENGINE: ['JS' , 'WASM'],
 };
 

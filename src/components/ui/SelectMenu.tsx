@@ -17,7 +17,13 @@ export const SelectMenu = ({values, id}:MenuProps) => {
     const {options,setOptions} = useMazeContext();
 
     const handleOptions = (e:ChangeEvent<HTMLSelectElement>) => {
-        const { name, value } = e.target;
+        const name = e.target.name;
+        let value: string | number = e.target.value;
+
+        if (name == 'Size') {
+            value = Number(value);
+        };
+
         setOptions((prev) => ({
             ...prev,
             [name.toLowerCase()]:value
