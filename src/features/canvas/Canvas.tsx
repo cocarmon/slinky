@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { generateMaze } from "@/utils/mazeGenerator";
-import { bfsAlgorithm } from '@/utils/algorithms'; 
+import { algorithms } from '@/utils/algorithms'; 
+import cloneDeep from "lodash.clonedeep";
+import type { Maze } from '@/types';
 
 interface CanvasProps {
     size: number;
     start:boolean;
+    name: string;
+    grid: Maze;
     resetStart: () => void
 };
 
@@ -12,10 +15,11 @@ interface Rectangle {
     x: number;
     y: number;
     ctx: CanvasRenderingContext2D;
-}
+};
 
-export default function Canvas({size,start,resetStart}:CanvasProps) {
-    const maze = useMemo(()=>generateMaze(Number(size)),[size]);
+
+export default function Canvas({size,grid, name, start,resetStart}:CanvasProps) {
+    const maze = useMemo(()=>cloneDeep(grid),[grid]);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null); // occupies the avaible screen space so we can calculate the canvas's space for responsiveness
     
@@ -52,8 +56,8 @@ export default function Canvas({size,start,resetStart}:CanvasProps) {
     },[maze])
 
     const drawMaze = useCallback((ctx:CanvasRenderingContext2D ) => {
-        const cellWidth = canvasRef.current!.width / Number(size);
-        const cellHeight = canvasRef.current!.height / Number(size);
+        const cellWidth = canvasRef.current!.width / size;
+        const cellHeight = canvasRef.current!.height / size;
         ctx.clearRect(0,0,canvasRef.current!.width,canvasRef.current!.height);
 
         // wall color
@@ -102,17 +106,17 @@ export default function Canvas({size,start,resetStart}:CanvasProps) {
             };
         };
         ctx.stroke();
-    },[maze]);
+    },[maze,size]);
 
     const handleOnStart = useCallback(async (ctx:CanvasRenderingContext2D) => {
-        ctx.fillStyle = '#f87171';
-        for (const [x, y] of bfsAlgorithm(maze)) {
+        for (const [x, y] of algorithms[name](maze)) {
+            ctx.fillStyle = '#f87171';
             drawRect({ x, y, ctx });
             // returns once the rectangle has been drawn on screen
             await new Promise(requestAnimationFrame);
         }
         drawShortestPath(ctx);
-    },[maze])
+    },[maze,name])
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -123,7 +127,7 @@ export default function Canvas({size,start,resetStart}:CanvasProps) {
         canvas.height = height;
         const ctx = canvas.getContext('2d')!;
         drawMaze(ctx);
-    },[maze,drawMaze]);
+    },[grid,drawMaze]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -132,7 +136,7 @@ export default function Canvas({size,start,resetStart}:CanvasProps) {
         const ctx = canvas.getContext('2d')!;
         handleOnStart(ctx);
         resetStart();
-    },[start,handleOnStart,drawShortestPath]);
+    },[start]);
 
     return (
         <div ref={containerRef} className="h-full w-full ">
