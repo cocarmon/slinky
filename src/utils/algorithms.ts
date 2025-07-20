@@ -6,8 +6,12 @@ interface NextRectangleLogic {
     x:number;
     ds: number[][];
 };
-// f = g + wh
-const WEIGHT = 1.75;
+
+interface Heap {
+    cord: number[],
+    g: number;
+    h:number;
+};
 
 // cells can be reached from multiple paths, make sure you're not overwriting an already set prev node 
 const nextRectangleLogic = ({maze,y,x,ds}:NextRectangleLogic) => {
@@ -74,7 +78,7 @@ const manhattanDistance = (size:number,x1:number,y1:number) => {
     return  Math.abs(size-x1) + Math.abs(size-y1)
 };
 // used when the root node is removed 
-const heapifyDown = (heap) => {
+const heapifyDown = (heap:Heap[]) => {
     const rootNode = heap[0];
     heap[0] = heap[heap.length - 1];
     heap.pop();
@@ -111,7 +115,7 @@ const heapifyDown = (heap) => {
     return rootNode;
 };
 // used whenever a node is added to the heap to find its correct position
-const heapifyUp = (heap) => {
+const heapifyUp = (heap:Heap[]) => {
     let counter = heap.length - 1;
     while(true) {
         const parentIndex = Math.floor((counter - 1)/2);
@@ -123,6 +127,8 @@ const heapifyUp = (heap) => {
     }
 };
 
+// f = g + wh
+const WEIGHT = 1.75;
 function* aStarAlgorithm(maze:Maze) {
     const size = maze.length - 1;
     // here g is distance between the current node and the start

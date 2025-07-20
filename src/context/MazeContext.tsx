@@ -5,7 +5,7 @@ export type MazeOptionKey = 'engine' | 'size' | 'algorithm';
 
 export interface MazeOptions {
   engine: 'JS' | 'WASM';
-  size: 20 | 40 | 60 | 150;
+  size: 20 | 60 | 180 | 540;
   algorithm: "A*" | "Dijkstra" | "Breadth-First Search";
 }
 

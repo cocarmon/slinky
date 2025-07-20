@@ -1,17 +1,16 @@
 import { Select, SelectMenu } from '@/components/ui/SelectMenu';
 
 const MAZE_OPTIONS = {
-    SIZE: ['20' , '40' , '60' , '150'],
+    SIZE: ['20' , '60' , '180' , '540'],
     ALGORITHM: ["Breadth-First Search", "Depth-First Search", "A*" ],
     ENGINE: ['JS' , 'WASM'],
 };
 
 interface SidebarProps {
     handleOnStart: () =>void;
-    handleOnReset: () =>void;
 };
 
-export default function Sidebar({handleOnStart,handleOnReset}:SidebarProps) {
+export default function Sidebar({handleOnStart}:SidebarProps) {
 
     return (
         <div className="w-64 flex flex-col items-center p-8 space-y-2">
@@ -31,9 +30,6 @@ export default function Sidebar({handleOnStart,handleOnReset}:SidebarProps) {
                 </button>
 
             </div>
-            <button onClick={handleOnReset} className="bg-green-500 h-8 w-16  text-white font-semibold rounded-md cursor-pointer">
-                    Reset
-            </button>
         </div>
     )
 }
