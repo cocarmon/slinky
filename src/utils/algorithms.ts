@@ -67,10 +67,107 @@ function* dfsAlgorithm(maze:Maze) {
         };
 
     };
+// distance as the crow flies
+const manhattanDistance = (size:number,x1:number,y1:number) => {
+    return  Math.abs(size-x1) + Math.abs(size-y1)
+};
+// used when the root node is removed 
+const heapifyDown = (heap) => {
+    const rootNode = heap[0];
+    heap[0] = heap[heap.length - 1];
+    heap.pop();
+    if (heap.length == 0) return rootNode;
+    // used to determine the current index of the current node
+    let counter = 0;
+    while(true) {
+        // refactor this at some point
+        let left = {g: Infinity,h:Infinity};
+        let right = {g: Infinity,h:Infinity};
+        if(heap[2*counter + 1] != undefined) {
+            left = heap[2*counter + 1];
+        }
+        if(heap[2*counter + 2] != undefined) {
+            right = heap[2*counter + 2];
+        }
 
+        if(left.g == Infinity && right.g == Infinity) break;
+        // chooses the child node with the lowest cost
+        let nextNodeIndex = left.g + left.h > right.g + right.h ? 2*counter + 2 : 2*counter + 1;
+        // if child nodes cost are equal choose the one with the lower h value
+        if (left.g + left.h === right.g + right.h) {
+            if (left.h < right.h) {
+                nextNodeIndex = 2*counter + 1
+            } else {
+                nextNodeIndex = 2*counter + 2
+            }
+        }
+        // node has found it's place in the heap
+        if ((heap[counter].g + heap[counter].h) < (heap[nextNodeIndex].g + heap[nextNodeIndex].h)) break;
+        [heap[counter], heap[nextNodeIndex]] = [heap[nextNodeIndex], heap[counter]];
+        counter = nextNodeIndex;
+    }
+    return rootNode;
+};
+// used whenever a node is added to the heap to find its correct position
+const heapifyUp = (heap) => {
+    let counter = heap.length - 1;
+    while(true) {
+        const parentIndex = Math.floor((counter - 1)/2);
+        if (parentIndex < 0) break;
+        if ((heap[parentIndex].g +heap[parentIndex].h)  <= (heap[counter].g+heap[counter].h)) break;
+        [heap[counter], heap[parentIndex]] = [heap[parentIndex],heap[counter]];
+
+        counter = parentIndex;
+    }
+};
+
+function* aStarAlgorithm(maze:Maze) {
+    const size = maze.length - 1;
+    // here g is distance between the current node and the start
+    const heap = [{cord:[0,0], h:manhattanDistance(size,0,0),g:0}];
+    while (heap.length > 0) {
+        // cord = [x,y]
+        const {cord,g} = heapifyDown(heap);
+        if (!maze[cord[1]][cord[0]].seen) {
+            maze[cord[1]][cord[0]].seen = true
+            if (cord[0] ==size && cord[1] == size) {
+                break;
+            };
+        if(!maze[cord[1]][cord[0]].walls.left && !maze[cord[1]][cord[0]-1].seen){
+            heap.push({cord:[cord[0]-1,cord[1]], h: manhattanDistance(size,cord[0]-1,cord[1]),g:g+1});
+            heapifyUp(heap)
+            maze[cord[1]][cord[0]-1].prev = [cord[0],cord[1]];
+        }
+
+        if(!maze[cord[1]][cord[0]].walls.right && !maze[cord[1]][cord[0]+1].seen){
+            heap.push({cord:[cord[0]+1,cord[1]], h: manhattanDistance(size,cord[0]+1,cord[1]),g:g+1});
+            heapifyUp(heap)
+            maze[cord[1]][cord[0]+1].prev = [cord[0],cord[1]];
+        }
+
+        if(!maze[cord[1]][cord[0]].walls.top && !maze[cord[1]-1][cord[0]].seen){
+            heap.push({cord:[cord[0],cord[1]-1], h: manhattanDistance(size,cord[0],cord[1]-1),g:g+1});
+            heapifyUp(heap)
+            maze[cord[1]-1][cord[0]].prev = [cord[0],cord[1]];
+        }
+
+        if(!maze[cord[1]][cord[0]].walls.bottom && !maze[cord[1]+1][cord[0]].seen){
+            heap.push({cord:[cord[0],cord[1]+1], h: manhattanDistance(size,cord[0],cord[1]+1),g:g+1});
+            heapifyUp(heap)
+            maze[cord[1]+1][cord[0]].prev = [cord[0],cord[1]];
+        }
+            yield [cord[0],cord[1]];
+        }
+        // found the maze exit
+        if (cord[0] === maze[0].length - 1 && cord[1] === maze.length - 1) {
+            break;
+        }
+    };
+
+};
 
 export const algorithms = {
     "Breadth-First Search": bfsAlgorithm,
     "Depth-First Search": dfsAlgorithm,
-    "A*": () =>{},
+    "A*": aStarAlgorithm,
 };
