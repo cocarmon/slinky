@@ -45,7 +45,7 @@ export default function Canvas({size,grid, name, start,resetStart}:CanvasProps) 
         // the maze is always a square
         let matrixNode = maze[maze.length - 1][maze.length - 1];
         ctx.fillStyle = '#dc2626';
-        
+
         do {
             drawRect({x:matrixNode.x,y:matrixNode.y,ctx});
             if(!matrixNode.prev) break;
@@ -110,6 +110,7 @@ export default function Canvas({size,grid, name, start,resetStart}:CanvasProps) 
 
     const handleOnStart = useCallback(async (ctx:CanvasRenderingContext2D) => {
         let counter = 0;
+        const start = performance.now();
         for (const [x, y] of algorithms[name](maze)) {
             ctx.fillStyle = '#f87171';
             drawRect({ x, y, ctx });
@@ -117,7 +118,9 @@ export default function Canvas({size,grid, name, start,resetStart}:CanvasProps) 
             await new Promise(requestAnimationFrame);
             counter++;
         };
-        alert(`Number of steps: ${counter}`)
+        const end = performance.now();
+
+        alert(`Number of steps: ${counter}, time:${((end-start)/1000).toFixed(2)} sec`)
         drawShortestPath(ctx);
     },[maze,name])
 

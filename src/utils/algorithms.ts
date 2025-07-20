@@ -6,6 +6,8 @@ interface NextRectangleLogic {
     x:number;
     ds: number[][];
 };
+// f = g + wh
+const WEIGHT = 1.75;
 
 // cells can be reached from multiple paths, make sure you're not overwriting an already set prev node 
 const nextRectangleLogic = ({maze,y,x,ds}:NextRectangleLogic) => {
@@ -114,7 +116,7 @@ const heapifyUp = (heap) => {
     while(true) {
         const parentIndex = Math.floor((counter - 1)/2);
         if (parentIndex < 0) break;
-        if ((heap[parentIndex].g +heap[parentIndex].h)  <= (heap[counter].g+heap[counter].h)) break;
+        if ((heap[parentIndex].g +heap[parentIndex].h)  < (heap[counter].g+heap[counter].h)) break;
         [heap[counter], heap[parentIndex]] = [heap[parentIndex],heap[counter]];
 
         counter = parentIndex;
@@ -124,7 +126,7 @@ const heapifyUp = (heap) => {
 function* aStarAlgorithm(maze:Maze) {
     const size = maze.length - 1;
     // here g is distance between the current node and the start
-    const heap = [{cord:[0,0], h:manhattanDistance(size,0,0),g:0}];
+    const heap = [{cord:[0,0], h:manhattanDistance(size,0,0)*WEIGHT,g:0}];
     while (heap.length > 0) {
         // cord = [x,y]
         const {cord,g} = heapifyDown(heap);
@@ -134,25 +136,25 @@ function* aStarAlgorithm(maze:Maze) {
                 break;
             };
         if(!maze[cord[1]][cord[0]].walls.left && !maze[cord[1]][cord[0]-1].seen){
-            heap.push({cord:[cord[0]-1,cord[1]], h: manhattanDistance(size,cord[0]-1,cord[1]),g:g+1});
+            heap.push({cord:[cord[0]-1,cord[1]], h: manhattanDistance(size,cord[0]-1,cord[1])*WEIGHT,g:g+1});
             heapifyUp(heap)
             maze[cord[1]][cord[0]-1].prev = [cord[0],cord[1]];
         }
 
         if(!maze[cord[1]][cord[0]].walls.right && !maze[cord[1]][cord[0]+1].seen){
-            heap.push({cord:[cord[0]+1,cord[1]], h: manhattanDistance(size,cord[0]+1,cord[1]),g:g+1});
+            heap.push({cord:[cord[0]+1,cord[1]], h: manhattanDistance(size,cord[0]+1,cord[1])*WEIGHT,g:g+1});
             heapifyUp(heap)
             maze[cord[1]][cord[0]+1].prev = [cord[0],cord[1]];
         }
 
         if(!maze[cord[1]][cord[0]].walls.top && !maze[cord[1]-1][cord[0]].seen){
-            heap.push({cord:[cord[0],cord[1]-1], h: manhattanDistance(size,cord[0],cord[1]-1),g:g+1});
+            heap.push({cord:[cord[0],cord[1]-1], h: manhattanDistance(size,cord[0],cord[1]-1)*WEIGHT,g:g+1});
             heapifyUp(heap)
             maze[cord[1]-1][cord[0]].prev = [cord[0],cord[1]];
         }
 
         if(!maze[cord[1]][cord[0]].walls.bottom && !maze[cord[1]+1][cord[0]].seen){
-            heap.push({cord:[cord[0],cord[1]+1], h: manhattanDistance(size,cord[0],cord[1]+1),g:g+1});
+            heap.push({cord:[cord[0],cord[1]+1], h: manhattanDistance(size,cord[0],cord[1]+1)*WEIGHT,g:g+1});
             heapifyUp(heap)
             maze[cord[1]+1][cord[0]].prev = [cord[0],cord[1]];
         }
