@@ -128,11 +128,10 @@ const heapifyUp = (heap:Heap[]) => {
 };
 
 // f = g + wh
-const WEIGHT = 1;
-function* aStarAlgorithm(maze:Maze) {
+function* aStarAlgorithm(maze:Maze, weight:number) {
     const size = maze.length - 1;
     // here g is distance between the current node and the start
-    const heap = [{cord:[0,0], h:manhattanDistance(size,0,0)*WEIGHT,g:0}];
+    const heap = [{cord:[0,0], h:manhattanDistance(size,0,0)*weight,g:0}];
     while (heap.length > 0) {
         // cord = [x,y]
         const {cord,g} = heapifyDown(heap);
@@ -142,25 +141,25 @@ function* aStarAlgorithm(maze:Maze) {
                 break;
             };
         if(!maze[cord[1]][cord[0]].walls.left && !maze[cord[1]][cord[0]-1].seen){
-            heap.push({cord:[cord[0]-1,cord[1]], h: manhattanDistance(size,cord[0]-1,cord[1])*WEIGHT,g:g+1});
+            heap.push({cord:[cord[0]-1,cord[1]], h: manhattanDistance(size,cord[0]-1,cord[1])*weight,g:g+1});
             heapifyUp(heap)
             maze[cord[1]][cord[0]-1].prev = [cord[0],cord[1]];
         }
 
         if(!maze[cord[1]][cord[0]].walls.right && !maze[cord[1]][cord[0]+1].seen){
-            heap.push({cord:[cord[0]+1,cord[1]], h: manhattanDistance(size,cord[0]+1,cord[1])*WEIGHT,g:g+1});
+            heap.push({cord:[cord[0]+1,cord[1]], h: manhattanDistance(size,cord[0]+1,cord[1])*weight,g:g+1});
             heapifyUp(heap)
             maze[cord[1]][cord[0]+1].prev = [cord[0],cord[1]];
         }
 
         if(!maze[cord[1]][cord[0]].walls.top && !maze[cord[1]-1][cord[0]].seen){
-            heap.push({cord:[cord[0],cord[1]-1], h: manhattanDistance(size,cord[0],cord[1]-1)*WEIGHT,g:g+1});
+            heap.push({cord:[cord[0],cord[1]-1], h: manhattanDistance(size,cord[0],cord[1]-1)*weight,g:g+1});
             heapifyUp(heap)
             maze[cord[1]-1][cord[0]].prev = [cord[0],cord[1]];
         }
 
         if(!maze[cord[1]][cord[0]].walls.bottom && !maze[cord[1]+1][cord[0]].seen){
-            heap.push({cord:[cord[0],cord[1]+1], h: manhattanDistance(size,cord[0],cord[1]+1)*WEIGHT,g:g+1});
+            heap.push({cord:[cord[0],cord[1]+1], h: manhattanDistance(size,cord[0],cord[1]+1)*weight,g:g+1});
             heapifyUp(heap)
             maze[cord[1]+1][cord[0]].prev = [cord[0],cord[1]];
         }

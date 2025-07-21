@@ -12,7 +12,7 @@ const MAZE_OPTIONS = {
 
 interface SidebarProps {
     handleOnStart: () =>void;
-    mazeMetrics: {steps: number, time:number}
+    mazeMetrics: {steps: number, time:string}
 };
 
 export default function Sidebar({handleOnStart,mazeMetrics}:SidebarProps) {

@@ -20,12 +20,12 @@ const chooseWall = ({x,y,grid}:ChooseWallTypes) => {
     
     const offsets = {left:[-1,0], right:[1,0], up:[0,-1], down:[0,1]};
     const possibleDirections = {left:x > 0, right:x < grid.length - 1, up:y > 0, down:y < grid.length - 1};
-    const validMoves = Object.keys(possibleDirections).filter((direction) => possibleDirections[direction]);
+    const validMoves = Object.keys(possibleDirections).filter((direction) => possibleDirections[direction as "left" | "right" | "up" | "down"]);
 
     let newX=0,newY=0,shouldBackTrack = false,randomMove=0;
     while(keepGoing) {
         randomMove = Math.floor(Math.random() * validMoves.length);
-        const [dx,dy] = offsets[validMoves[randomMove]];
+        const [dx,dy] = offsets[validMoves[randomMove as number] as "left" | "right" | "up" | "down"];
         newX = dx + x;
         newY = dy + y;
 

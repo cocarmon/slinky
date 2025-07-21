@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { algorithms } from '@/utils/algorithms'; 
 import type { Maze } from '@/types';
 
@@ -14,14 +14,13 @@ interface Rectangle extends WidthAndHeight, Context{
     y: number;
 };
 
-type MazeDimensions = WidthAndHeight & Context & {speed:number,weight:number};
+type MazeDimensions = WidthAndHeight & Context;
+type MazeParams = MazeDimensions & {speed:number,weight:number};
 
 interface UseMazeAnimator {
     maze: Maze;
     size: number;
     algorithmName: string;
-    speed: number;
-    weight: number;
 };
 
 export const useMazeAnimator = ({maze, size, algorithmName}:UseMazeAnimator) =>{
@@ -58,11 +57,11 @@ export const useMazeAnimator = ({maze, size, algorithmName}:UseMazeAnimator) =>{
     },[maze]);
 
 
-    const solveMaze = useCallback(async ({height, width,speed,weight, ctx}:MazeDimensions) => {
+    const solveMaze = useCallback(async ({height, width,speed,weight, ctx}:MazeParams) => {
         const currentSpeed = 5-speed;
         let numberOfSteps = 0;
         const startTime = performance.now();
-        for (const [x, y] of algorithms[algorithmName](maze,weight)) {
+        for (const [x, y] of algorithms[algorithmName as "A*" | "Depth-First Search" | "Breadth-First Search"](maze,weight)) {
                 ctx.fillStyle = '#f87171';
                 await new Promise(resolve => setTimeout(resolve, currentSpeed * 100));
                 // resolves happens at the start of the frame, giving a smoother aniimation
