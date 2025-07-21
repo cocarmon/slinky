@@ -14,16 +14,17 @@ interface Rectangle extends WidthAndHeight, Context{
     y: number;
 };
 
-type MazeDimensions = WidthAndHeight & Context;
+type MazeDimensions = WidthAndHeight & Context & {speed:number,weight:number};
 
 interface UseMazeAnimator {
     maze: Maze;
     size: number;
     algorithmName: string;
+    speed: number;
+    weight: number;
 };
 
 export const useMazeAnimator = ({maze, size, algorithmName}:UseMazeAnimator) =>{
-    const [numberOfSteps,setNumberOfSteps] = useState(0);
     
     const drawRect = ({x,y,ctx,width, height}:Rectangle)  => {
         const padding = 3;
@@ -57,17 +58,23 @@ export const useMazeAnimator = ({maze, size, algorithmName}:UseMazeAnimator) =>{
     },[maze]);
 
 
-    const solveMaze = useCallback(async ({height, width, ctx}:MazeDimensions) => {
-        for (const [x, y] of algorithms[algorithmName](maze)) {
-            ctx.fillStyle = '#f87171';
-            drawRect({ x, y, height, width, ctx });
-            // returns once the rectangle has been drawn on screen
-            await new Promise(requestAnimationFrame);
-            setNumberOfSteps(p=>p++);
+    const solveMaze = useCallback(async ({height, width,speed,weight, ctx}:MazeDimensions) => {
+        const currentSpeed = 5-speed;
+        let numberOfSteps = 0;
+        const startTime = performance.now();
+        for (const [x, y] of algorithms[algorithmName](maze,weight)) {
+                ctx.fillStyle = '#f87171';
+                await new Promise(resolve => setTimeout(resolve, currentSpeed * 100));
+                // resolves happens at the start of the frame, giving a smoother aniimation
+                await new Promise(resolve => requestAnimationFrame(resolve));
+                drawRect({ x, y, height, width, ctx });
+            numberOfSteps+=1
         };
-        // alert(`Number of steps: ${counter}, time:${((end-start)/1000).toFixed(2)} sec`)
+        const endTime = performance.now();
+
         drawShortestPath({ height, width, ctx});
+        return {time: ((endTime-startTime)/1000).toFixed(2),steps:numberOfSteps}
     },[maze,algorithmName])
 
-    return {solveMaze, numberOfSteps};
+    return {solveMaze};
 }

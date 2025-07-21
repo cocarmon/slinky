@@ -6,7 +6,9 @@ export type MazeOptionKey = 'engine' | 'size' | 'algorithm';
 export interface MazeOptions {
   engine: 'JS' | 'WASM';
   size: 20 | 60 | 180 | 540;
-  algorithm: "A*" | "Dijkstra" | "Breadth-First Search";
+  algorithm: "A*" | "Depth-First Search" | "Breadth-First Search";
+  speed: 1 | 2 | 3 | 4 | 5;
+  weight:1;
 }
 
 interface MazeContextType {
@@ -18,6 +20,8 @@ const defaultOptions: MazeOptions = {
   engine: 'JS',
   size: 20,
   algorithm: 'Breadth-First Search',
+  speed:3,
+  weight:1.
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

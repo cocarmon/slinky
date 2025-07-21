@@ -128,7 +128,7 @@ const heapifyUp = (heap:Heap[]) => {
 };
 
 // f = g + wh
-const WEIGHT = 1.75;
+const WEIGHT = 1;
 function* aStarAlgorithm(maze:Maze) {
     const size = maze.length - 1;
     // here g is distance between the current node and the start
