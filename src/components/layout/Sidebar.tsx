@@ -18,13 +18,17 @@ interface SidebarProps {
 export default function Sidebar({handleOnStart,mazeMetrics}:SidebarProps) {
     const {options,setOptions} = useMazeContext();
 
-    const handleOptions = (e:ChangeEvent<HTMLSelectElement>) => {
+    const handleOptions = (e:ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const name = e.target.name;
         let value: string | number = e.target.value;
 
         if (name == 'Size') {
             value = Number(value);
         };
+
+        if (name == "weight" && !value) {
+            value = 1
+        }
 
         setOptions((prev) => ({
             ...prev,
@@ -68,14 +72,14 @@ export default function Sidebar({handleOnStart,mazeMetrics}:SidebarProps) {
                 />
             </SelectWrapper>
             {options.algorithm == 'A*' &&
-                <SelectWrapper name='Weight (1.0-2.0)' width='w-48'>
+                <SelectWrapper name='Weight' width='w-48'>
                     <input
                     id="weight"
                     name="weight"
                     type="number"
                     placeholder="1.00"
-                    min={1}
-                    max={2}
+                    onChange={handleOptions}
+                    defaultValue={1}
                     step="0.05"
                     aria-describedby="h-weight"
                         className="col-start-1 bg-transparent row-start-1 w-full appearance-none rounded-md  py-1.5 pr-8 pl-3 text-base text-zinc-500 outline-1 -outline-offset-1 outline-gray-500 focus:outline-2 focus:-outline-offset-2 hover:bg-green-500 focus:outline-green-500 sm:text-sm/6 cursor-pointer"

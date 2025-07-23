@@ -15,7 +15,7 @@ function App() {
 
     const handleOnStart = useCallback(() => {
       setMazeSolverState((p) => {
-        if (p == 'done') setResetKey(p => p + 1);
+        if (p == 'done' || p == 'running') setResetKey(p => p + 1);
         return 'running'
       });
     },[mazeSolverState]);

@@ -43,8 +43,10 @@ export default function Canvas({grid,mazeSolverState,setMazeMetrics, updateSolve
     },[mazeSolverState]);
 
     return (
-        <div ref={containerRef} className="h-full w-full ">
-            <canvas ref={canvasRef} />
+        <div  className="h-full w-full p-4 rounded-md ">
+            <div ref={containerRef} className="h-full w-full bg-zinc-800">
+                <canvas ref={canvasRef} />
+            </div>
         </div>
 
     )

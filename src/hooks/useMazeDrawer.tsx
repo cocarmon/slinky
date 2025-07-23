@@ -21,15 +21,17 @@ const useMazeDrawer = ({ maze, size}:useMazeDrawer) => {
         const cellHeight = height / size;
         ctx.clearRect(0,0,width, height);
 
+        // Wall width
+        ctx.lineWidth = 1;
         // wall color
         ctx.strokeStyle = '#22c55e';
 
         // starting cell
-        ctx.fillStyle = '#3b82f6';
+        ctx.fillStyle = "#008236";
         ctx.fillRect(0, 0, cellWidth, cellHeight);
 
         // end cell
-        ctx.fillStyle = '#ef4444';
+        ctx.fillStyle = '#82181a';
         ctx.fillRect((maze[0].length - 1) * cellWidth, (maze.length-1) * cellHeight, cellWidth, cellHeight);
 
         ctx.beginPath();

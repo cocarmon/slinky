@@ -45,7 +45,7 @@ export const useMazeAnimator = ({maze, size, algorithmName}:UseMazeAnimator) =>{
         // the maze is always a square
         let matrixNode = maze[maze.length - 1][maze.length - 1];
 
-        ctx.fillStyle = '#dc2626';
+        ctx.fillStyle = '#ff6467';
 
         do {
             drawRect({x:matrixNode.x,y:matrixNode.y, height, width, ctx});
@@ -62,7 +62,7 @@ export const useMazeAnimator = ({maze, size, algorithmName}:UseMazeAnimator) =>{
         let numberOfSteps = 0;
         const startTime = performance.now();
         for (const [x, y] of algorithms[algorithmName as "A*" | "Depth-First Search" | "Breadth-First Search"](maze,weight)) {
-                ctx.fillStyle = '#f87171';
+                ctx.fillStyle = '#fafafa';
                 await new Promise(resolve => setTimeout(resolve, currentSpeed * 100));
                 // resolves happens at the start of the frame, giving a smoother aniimation
                 await new Promise(resolve => requestAnimationFrame(resolve));
