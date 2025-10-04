@@ -6,7 +6,7 @@ A web-based tool that lets users generate mazes, solve them using different algo
 
 ## 🚀 Live Demo
 
-🔗 NA
+🔗 https://c08372bf.slinky-ac2.pages.dev/
 
 ---
 
